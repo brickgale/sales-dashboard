@@ -20,7 +20,7 @@ class PizzaController extends Controller
 
         $page = $request->input('page', 1);
 
-        $pizzas = Pizza::latest()->paginate(10)->appends(['page' => $page]);
+        $pizzas = Pizza::latest()->with('pizzaType')->paginate(10)->appends(['page' => $page]);
 
         return response()->json([
             'pizzas' => $pizzas

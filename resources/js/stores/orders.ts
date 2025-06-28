@@ -15,7 +15,10 @@ export const useOrderStore = defineStore('orders', {
             this.loading = true;
             try {
                 const response = await orderService.fetchOrders(payload);
-                this.orders = response.data;
+                const { data, current_page, total } = response.data.orders;
+                this.orders = data;
+                this.currentPage = current_page;
+                this.total = total;
                 return response;
             } catch (error) {
                 throw error;

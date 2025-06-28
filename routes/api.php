@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\ProfileController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderDetailController;
 use App\Http\Controllers\Api\PizzaController;
@@ -22,5 +23,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('order-details', OrderDetailController::class);
     Route::apiResource('pizzas', PizzaController::class);
     Route::apiResource('pizza-types', PizzaTypeController::class);
+
+    // Dashboard routes
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('/dashboard/sales-by-month', [DashboardController::class, 'salesByMonth']);
 
 });

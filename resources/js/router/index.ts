@@ -6,7 +6,7 @@ const AdminLayout = () => import('@/layouts/AdminLayout.vue');
 const Login = () => import('@/pages/Login.vue');
 const Dashboard = () => import('@/pages/admin/Dashboard.vue');
 const Pizzas = () => import('@/pages/admin/pizzas/Pizzas.vue');
-const Orders = () => import('@/pages/admin/Orders.vue');
+const Orders = () => import('@/pages/admin/orders/Orders.vue');
 const EditProfile = () => import('@/pages/admin/EditProfile.vue');
 
 const routes = [

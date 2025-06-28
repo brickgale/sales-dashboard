@@ -6,78 +6,77 @@ import AlertDialog from '@/components/partials/AlertDialog.vue';
 import Pagination from '@/components/partials/Pagination.vue';
 import { Button } from '@ui/button';
 import { Plus, SquarePen, Trash } from 'lucide-vue-next';
-import PizzaForm from './PizzaForm.vue';
-import PizzaTypes from './PizzaTypes.vue';
-import { usePizzaStore } from '@/stores/pizza';
+import OrderForm from './Form.vue';
+import { useOrderStore } from '@/stores/orders';
 import { onMounted, ref } from 'vue';
 import { handleError } from '@/lib/utils';
 import { toast } from 'vue-sonner';
 
-const pizzaStore = usePizzaStore();
+const orderStore = useOrderStore();
 const addDialogOpen = ref(false);
 const editDialogOpen = ref<boolean[]>([]);
 
 const columns: string[] = [
-    'Pizza Type',
-    'Size',
-    'Price',
+    'Order ID',
+    'Date',
+    'Time',
+    'Items Ordered',
     'Actions',
 ];
 
-const fetchPizzas = async (page: number = 1) => {
+const fetchOrders = async (page: number = 1) => {
     try {
-        await pizzaStore.fetchPizzas({ page });
+        await orderStore.fetchOrders({ page });
     } catch (error) {
-        console.error('Error fetching pizzas:', error);
+        console.error('Error fetching orders:', error);
     }
 };
 
 onMounted(() => {
-    fetchPizzas();
+    fetchOrders();
 });
 
 const successCreation = (message: string) => {
     addDialogOpen.value = false;
     toast.success(message);
-    fetchPizzas();
+    fetchOrders();
 };
 
-const deletePizza = async (pizza: any) => {
+const deleteOrder = async (order: any) => {
     try {
-        await pizzaStore.deletePizza(pizza.id);
-        toast.success('Pizza deleted successfully');
-        fetchPizzas();
+        await orderStore.deleteOrder(order.id);
+        toast.success('Order deleted successfully');
+        fetchOrders();
     } catch (error) {
-        handleError('Pizza deletion unsuccessful',error);
+        handleError('Order deletion unsuccessful', error);
     }
 };
 
 </script>
 
 <template>
-    <div class="flex flex-col p-6 justify-center items-center gap-6">
+    <div class="flex p-6 justify-center">
         <Card class="w-full max-w-4xl">
             <CardHeader>
                 <div class="flex items-center justify-between h-[36px]">
-                    <h2 class="text-lg font-semibold">Pizzas</h2>
-
+                    <h2 class="text-lg font-semibold">Orders</h2>
                     <div class="flex gap-3">
                         <Dialog 
-                            title="Add Pizza"
+                            title="Add Order"
                             class="sm:max-w-[600px]"
                             :open="addDialogOpen"
                             @update:open="addDialogOpen = $event"
                         >
-                            <PizzaForm 
+                            <OrderForm 
                                 @error="handleError"
                                 @success="successCreation"
                             />
                             <template #trigger>
-                                <Button 
+                                <Button
                                     @click.prevent="addDialogOpen = true"
                                 >
                                     <Plus class="h-4 w-4" />
-                                    Add Pizza
+                                    Add Order
                                 </Button>
                             </template>
                         </Dialog>
@@ -85,7 +84,7 @@ const deletePizza = async (pizza: any) => {
                 </div>
             </CardHeader>
             <CardContent>
-                <template v-if="!(pizzaStore.loading) && pizzaStore.pizzas.length">
+                <template v-if="!(orderStore.loading) && orderStore.orders.length">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -95,22 +94,21 @@ const deletePizza = async (pizza: any) => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow v-for="pizza in pizzaStore.pizzas" :key="pizza.id">
-                                <TableCell class="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {{ pizza.pizza_type?.name || 'N/A' }}
-                                </TableCell>
-                                <TableCell>{{ pizza.size }}</TableCell>
-                                <TableCell>${{ pizza.price }}</TableCell>
+                            <TableRow v-for="order in orderStore.orders" :key="order.id">
+                                <TableCell>{{ order.id }}</TableCell>
+                                <TableCell>{{ new Date(order.created_at).toLocaleDateString() }}</TableCell>
+                                <TableCell>{{ new Date(order.created_at).toLocaleTimeString() }}</TableCell>
+                                <TableCell>{{ order.order_details?.length || 0 }} items</TableCell>
                                 <TableCell class="flex items-center gap-2">
                                     <Button 
                                         variant="ghost-primary" 
                                         size="icon" 
-                                        @click.prevent="() => $router.push({ name: 'admin.pizzas.edit', params: { id: pizza.id } })"
+                                        @click.prevent="() => $router.push({ name: 'admin.orders.edit', params: { id: order.id } })"
                                     ><SquarePen /></Button>
                                     <AlertDialog 
-                                        title="Delete Pizza"
-                                        :description="`Are you sure you want to delete this pizza? This action cannot be undone.`"
-                                        @continue="deletePizza(pizza)"
+                                        title="Delete Order"
+                                        :description="`Are you sure you want to delete this order? This action cannot be undone.`"
+                                        @continue="deleteOrder(order)"
                                     >
                                         <template #trigger>
                                             <Button 
@@ -125,20 +123,18 @@ const deletePizza = async (pizza: any) => {
                     </Table>
                     <Pagination
                         class="pt-2"
-                        :total="pizzaStore.total"
-                        :per-page="pizzaStore.perPage"
-                        :current-page="pizzaStore.currentPage"
-                        @update:page="fetchPizzas"
+                        :total="orderStore.total"
+                        :per-page="orderStore.perPage"
+                        :current-page="orderStore.currentPage"
+                        @update:page="fetchOrders"
                     />
                 </template>
                 <div v-else class="flex items-center justify-center h-full">
                     <p class="text-gray-500">
-                        {{ pizzaStore.loading ? 'Loading...' : 'No pizzas found.' }}
+                        {{ orderStore.loading ? 'Loading...' : 'No orders found.' }}
                     </p>
                 </div>
             </CardContent>
         </Card>
-
-        <PizzaTypes />
     </div>
 </template>

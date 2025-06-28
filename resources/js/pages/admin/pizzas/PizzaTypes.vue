@@ -17,11 +17,11 @@ const addDialogOpen = ref(false);
 const editDialogOpen = ref<boolean[]>([]);
 
 const columns: string[] = [
-    'name',
-    'slug',
-    'category',
-    'ingredients',
-    'actions',
+    'Name',
+    'Slug',
+    'Category',
+    'Ingredients',
+    'Actions',
 ];
 
 const fetchPizzaTypes = async (page: number = 1) => {
