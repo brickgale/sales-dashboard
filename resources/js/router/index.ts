@@ -5,6 +5,9 @@ const AdminLayout = () => import('@/layouts/AdminLayout.vue');
 
 const Login = () => import('@/pages/Login.vue');
 const Dashboard = () => import('@/pages/admin/Dashboard.vue');
+const Pizzas = () => import('@/pages/admin/pizzas/Pizzas.vue');
+const Orders = () => import('@/pages/admin/Orders.vue');
+const EditProfile = () => import('@/pages/admin/EditProfile.vue');
 
 const routes = [
     {
@@ -27,6 +30,21 @@ const routes = [
                 path: '',
                 name: 'dashboard',
                 component: Dashboard,
+            },
+            {
+                path: '/pizzas',
+                name: 'pizzas',
+                component: Pizzas,
+            },
+            {
+                path: '/orders',
+                name: 'orders',
+                component: Orders,
+            },
+            {
+                path: '/edit-profile',
+                name: 'edit-profile',
+                component: EditProfile
             }
         ]
     }

@@ -19,13 +19,24 @@ class LoginController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', Rules\Password::defaults()],
+            'remember' => ['boolean'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $remember = $request->boolean('remember', false);
+        $attempt = Auth::attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password']
+        ], $remember);
+
+        if ($attempt) {
             $user = Auth::user();
+            $token = $user->createToken('API Token', ['*'], now()->addDays($remember ? 30 : 1));
+            
             return response()->json([
                 'user' => $user, 
-                'token' => $user->createToken('API Token')->plainTextToken
+                'token' => $token->plainTextToken,
+                'expires_at' => $token->accessToken->expires_at,
+                'remember' => $remember
             ]);
         }
 
@@ -34,17 +45,19 @@ class LoginController extends Controller
         ]);
     }
 
-    public function user(Request $request)
-    {
-        return response()->json($request->user());
-    }
-
     public function logout(Request $request)
     {
-        auth()->guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
+        // Delete the current access token
+        $request->user()->tokens()->where('id', $request->user()->currentAccessToken()->id)->delete();
+        
         return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    public function logoutAll(Request $request)
+    {
+        // Delete all tokens for the user (logout from all devices)
+        $request->user()->tokens()->delete();
+        
+        return response()->json(['message' => 'Logged out from all devices successfully']);
     }
 }
