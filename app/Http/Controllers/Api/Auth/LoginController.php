@@ -47,8 +47,9 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        // Delete the current access token
-        $request->user()->tokens()->where('id', $request->user()->currentAccessToken()->id)->delete();
+        auth()->guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         
         return response()->json(['message' => 'Logged out successfully']);
     }
