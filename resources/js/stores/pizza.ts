@@ -15,10 +15,12 @@ export const usePizzaStore = defineStore('pizzas', {
             this.loading = true;
             try {
                 const response = await pizzaService.fetchPizzas(payload);
-                const { data, current_page, total } = response.data.pizzas;
-                this.pizzas = data;
-                this.currentPage = current_page;
-                this.total = total;
+                if (payload.getAll !== 'true') {
+                    const { data, current_page, total } = response.data.pizzas;
+                    this.pizzas = data;
+                    this.currentPage = current_page;
+                    this.total = total;
+                }
                 return response;
             } catch (error) {
                 throw error;

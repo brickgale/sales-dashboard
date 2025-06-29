@@ -20,7 +20,14 @@ class PizzaController extends Controller
 
         $page = $request->input('page', 1);
 
-        $pizzas = Pizza::latest()->with('pizzaType')->paginate(10)->appends(['page' => $page]);
+        $query = Pizza::latest()->with('pizzaType');
+
+        $pizzas = [];
+        if ($request->input('getAll') == 'true') {
+            $pizzas = $query->get();
+        } else {
+            $pizzas = $query->paginate(10)->appends(['page' => $page]);
+        }
 
         return response()->json([
             'pizzas' => $pizzas
@@ -56,6 +63,20 @@ class PizzaController extends Controller
             ], 422);
         }
 
+        // Check if pizza type and size combination already exists
+        $existingPizza = Pizza::where('pizza_type_id', $request->pizza_type_id)
+            ->where('size', $request->size)
+            ->first();
+
+        if ($existingPizza) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => [
+                    'combination' => ['A pizza with this type and size already exists.']
+                ]
+            ], 422);
+        }
+
         $pizza = Pizza::create($request->validated());
         
         return response()->json([
@@ -82,6 +103,21 @@ class PizzaController extends Controller
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Check if pizza type and size combination already exists (excluding current pizza)
+        $existingPizza = Pizza::where('pizza_type_id', $request->pizza_type_id ?? $pizza->pizza_type_id)
+            ->where('size', $request->size ?? $pizza->size)
+            ->where('id', '!=', $id)
+            ->first();
+
+        if ($existingPizza) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => [
+                    'combination' => ['A pizza with this type and size already exists.']
+                ]
             ], 422);
         }
 

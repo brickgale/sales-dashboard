@@ -4,8 +4,9 @@ import { User } from '@/types';
 import { type LoginForm } from '@/types/auth';
 
 export const useAuthStore = defineStore('auth', {
-    state: (): { user: User | null, token: string | null } => ({
+    state: (): { user: User | null, token: string | null, loading: boolean } => ({
         user: null,
+        loading: false,
         token: localStorage.getItem('token'),
     }),
 
@@ -42,6 +43,19 @@ export const useAuthStore = defineStore('auth', {
                 return response;
             } catch (error) {
                 throw error;
+            }
+        },
+
+        async updateProfile(payload: Record<string, any>) {
+            this.loading = true;
+            try {
+                const response = await authService.updateProfile(payload);
+                this.user = response.data.user;
+                return response;
+            } catch (error) {
+                throw error;
+            } finally {
+                this.loading = false;
             }
         },
     },

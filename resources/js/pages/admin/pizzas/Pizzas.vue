@@ -19,6 +19,7 @@ const editDialogOpen = ref<boolean[]>([]);
 
 const columns: string[] = [
     'Pizza Type',
+    'Slug',
     'Size',
     'Price',
     'Actions',
@@ -38,6 +39,12 @@ onMounted(() => {
 
 const successCreation = (message: string) => {
     addDialogOpen.value = false;
+    toast.success(message);
+    fetchPizzas();
+};
+
+const successEdit = (message: string, pizza: any, key: number) => {
+    editDialogOpen.value[key] = false;
     toast.success(message);
     fetchPizzas();
 };
@@ -95,18 +102,39 @@ const deletePizza = async (pizza: any) => {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow v-for="pizza in pizzaStore.pizzas" :key="pizza.id">
-                                <TableCell class="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">
+                            <TableRow v-for="(pizza, key) in pizzaStore.pizzas" :key="pizza.id">
+                                <TableCell class="max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap">
                                     {{ pizza.pizza_type?.name || 'N/A' }}
                                 </TableCell>
-                                <TableCell>{{ pizza.size }}</TableCell>
-                                <TableCell>${{ pizza.price }}</TableCell>
+                                <TableCell class="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
+                                    {{ pizza.slug || 'N/A' }}
+                                </TableCell>
+                                <TableCell class="w-[100px]">{{ pizza.size }}</TableCell>
+                                <TableCell class="w-[100px] overflow-hidden text-ellipsis whitespace-nowrap">${{ pizza.price }}</TableCell>
                                 <TableCell class="flex items-center gap-2">
-                                    <Button 
-                                        variant="ghost-primary" 
-                                        size="icon" 
-                                        @click.prevent="() => $router.push({ name: 'admin.pizzas.edit', params: { id: pizza.id } })"
-                                    ><SquarePen /></Button>
+                                    <Dialog 
+                                        title="Edit Property Unit"
+                                        class="sm:max-w-[600px]"
+                                        :open="editDialogOpen[key]"
+                                        @update:open="editDialogOpen[key] = $event"
+                                        :key="key"
+                                    >
+                                        <PizzaForm 
+                                            :isEdit="true"
+                                            :defaultValues="pizza"
+                                            @error="handleError"
+                                            @success="successEdit($event, pizza, key)"
+                                            :key="key"
+                                        />
+                                        <template #trigger>
+                                            <Button 
+                                                variant="ghost-primary"
+                                                @click.prevent="editDialogOpen[key] = true"
+                                            >
+                                                <SquarePen />
+                                            </Button>
+                                        </template>
+                                    </Dialog>
                                     <AlertDialog 
                                         title="Delete Pizza"
                                         :description="`Are you sure you want to delete this pizza? This action cannot be undone.`"

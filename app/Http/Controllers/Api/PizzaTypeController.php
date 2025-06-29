@@ -19,7 +19,14 @@ class PizzaTypeController extends Controller
 
         $page = $request->input('page', 1);
         
-        $pizza_types = PizzaType::latest()->paginate(10)->appends(['page' => $page]);
+        $query = PizzaType::latest();
+
+        $pizza_types = [];
+        if ($request->input('getAll') == 'true') {
+            $pizza_types = $query->get();
+        } else {
+            $pizza_types = $query->paginate(10)->appends(['page' => $page]);
+        }
 
         return response()->json([
             'pizza_types' => $pizza_types

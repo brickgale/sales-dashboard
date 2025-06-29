@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useDashboardStore } from '@/stores/dashboard';
 import { computed, onMounted, ref } from 'vue';
 import { handleError, months } from '@/lib/utils';
+import { Pizza, ShoppingCart, DollarSign } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
 const dashboardStore = useDashboardStore();
@@ -26,7 +27,7 @@ const fetchDashboardData = async () => {
             year: selectedYear.value
         });
     } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
+        handleError('Error fetching dashboard stats', error);
     }
 };
 
@@ -46,7 +47,7 @@ onMounted(() => {
             <h2 class="text-2xl font-semibold mb-6">Hello, {{ name }}!</h2>
             
             <!-- Stats Cards -->
-            <div class="flex gap-6 mb-8">
+            <div class="flex flex-col md:flex-row gap-6 mb-8">
                 <!-- Pizza Count Card -->
                 <Card class="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white">
                     <CardContent class="p-6">
@@ -58,9 +59,7 @@ onMounted(() => {
                                 </p>
                             </div>
                             <div class="p-3 bg-white bg-opacity-20 rounded-full">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
+                                <Pizza class="w-8 h-8 text-orange-500" />
                             </div>
                         </div>
                     </CardContent>
@@ -77,9 +76,7 @@ onMounted(() => {
                                 </p>
                             </div>
                             <div class="p-3 bg-white bg-opacity-20 rounded-full">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
+                                <ShoppingCart class="w-8 h-8 text-blue-500" />
                             </div>
                         </div>
                     </CardContent>
@@ -96,9 +93,7 @@ onMounted(() => {
                                 </p>
                             </div>
                             <div class="p-3 bg-white bg-opacity-20 rounded-full">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                                </svg>
+                                <DollarSign class="w-8 h-8 text-green-500" />
                             </div>
                         </div>
                     </CardContent>
@@ -108,8 +103,8 @@ onMounted(() => {
             <!-- Filter Section -->
             <Card class="mb-6 p-1">
                 <CardContent class="p-4">
-                    <div class="flex items-end gap-4">
-                        <div class="flex-1">
+                    <div class="flex flex-col md:flex-row items-end gap-4">
+                        <div class="flex-1 w-full">
                             <Label for="month">Month</Label>
                             <Select v-model="selectedMonth" class="w-full">
                                 <SelectTrigger class="mt-1 w-full">
@@ -122,7 +117,7 @@ onMounted(() => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div class="flex-1">
+                        <div class="flex-1 w-full">
                             <Label for="year">Year</Label>
                             <Input 
                                 id="year" 
@@ -133,7 +128,7 @@ onMounted(() => {
                                 class="mt-1"
                             />
                         </div>
-                        <Button @click="applyFilter" :disabled="dashboardStore.loading">
+                        <Button @click="applyFilter" :disabled="dashboardStore.loading" class="w-full sm:w-auto">
                             {{ dashboardStore.loading ? 'Loading...' : 'Apply Filter' }}
                         </Button>
                     </div>

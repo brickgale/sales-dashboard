@@ -13,4 +13,8 @@ export default {
     async fetchUser() {
         return await http.get('/profile');
     },
+
+    async updateProfile(payload: Record<string, any>) {
+        return await http.put('/profile', payload);
+    },
 };

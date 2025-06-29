@@ -15,10 +15,12 @@ export const usePizzaTypeStore = defineStore('pizzaTypes', {
             this.loading = true;
             try {
                 const response = await pizzaTypeService.fetchPizzaTypes(payload);
-                const { data, current_page, total } = response.data.pizza_types;
-                this.pizzaTypes = data;
-                this.currentPage = current_page;
-                this.total = total;
+                if (payload.getAll !== 'true') {
+                    const { data, current_page, total } = response.data.pizza_types;
+                    this.pizzaTypes = data;
+                    this.currentPage = current_page;
+                    this.total = total;
+                }
                 return response;
             } catch (error) {
                 throw error;
